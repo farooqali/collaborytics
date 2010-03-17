@@ -1,0 +1,4 @@
+---
+RSCM::SubversionTest: subversion_rscm
+RSCM::CvsTest: cvs_metaproject
+RSCM::PerforceTest: p4_gfx

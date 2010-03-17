@@ -1,0 +1,225 @@
+<% content_for :title do %>
+	Collaborytics: <%= @repository.name %>
+<% end %>
+
+<% content_for :head do %>
+	<script type='text/javascript'>
+		//date range picker
+		$(function() {
+			$('select#select_metric, input#show_annotations').change(function() {
+				$("form#settings").submit();
+			});
+			$('input#date_range').daterangepicker(
+				{
+					dateFormat: 'M d, yy', 
+					earliestDate: new Date(<%=@date_range.first.year%>, <%=@date_range.first.month%>, <%=@date_range.first.day%>),
+					latestDate: new Date(),
+					presetRanges: [
+													<%if @repository.checkins.any?%>{text: 'Life of project', dateStart: <%=@repository.checkins.first.checked_in_at.to_date.to_s(:medium).to_json%>, dateEnd: <%=(@repository.checkins.last.checked_in_at.to_date + 1).to_s(:medium).to_json%>},<%end%>
+													{text: 'Last 7 days', dateStart: <%=7.days.ago.to_date.to_s(:medium).to_json%>, dateEnd: <%=DateTime.now.to_date.to_s(:medium).to_json%>},
+													{text: 'Last 30 days', dateStart: <%=30.days.ago.to_date.to_s(:medium).to_json%>, dateEnd: <%=DateTime.now.to_date.to_s(:medium).to_json%>},
+													{text: 'Month to date', dateStart: '<%=Date.today.year%>/<%=Date.today.month%>/1', dateEnd: <%=DateTime.now.to_date.to_s(:medium).to_json%>},
+													{text: 'Year to date', dateStart: '<%=Date.today.year%>/1/1', dateEnd: <%=DateTime.now.to_date.to_s(:medium).to_json%>}
+												],
+					onClose: function(x) { 
+						if($('input#date_range').val() != lastKnownDateRange) {
+							$("form#settings").submit();
+						}
+					}
+				}
+			);
+			var lastKnownDateRange = $('input#date_range').val();
+		});
+		
+		//annotated timeline
+		google.load('visualization', '1', {'packages':['annotatedtimeline', 'motionchart']});
+ 		google.setOnLoadCallback(function(){
+			drawAnnotatedTimeline();
+			drawMotionChart();
+		});
+
+		function drawAnnotatedTimeline()
+		{
+			var data = new google.visualization.DataTable();
+			data.addColumn('date', 'Date');
+			<% @selected_contributors.sort.each_with_index do |contributor, i| %>
+				data.addColumn('number', <%="#{contributor}:".to_json%>);
+				<% if @show_annotations %>
+					data.addColumn('string', 'title<%=i%>');
+				<% end %>
+			<% end %>
+			data.addRows(<%=@date_range.entries.size * @selected_contributors.size%>);
+			<% row = 0 %>
+			<% series = 0 %>
+			<% for contributor in @selected_contributors.sort %>
+				<% checkins_by_date = @checkins_by_contributor_by_date[contributor] || {} %>
+				<% for date in @date_range %>
+					<% checkins = checkins_by_date[date] || [] %>
+					data.setValue(<%=row%>, 0, new Date(<%=date.year%>, <%=date.month-1%>,<%=date.day%>));
+					data.setValue(<%=row%>, <%=(series*(@show_annotations?2:1)) + 1%>, <%=metric_value(@selected_metric, checkins)%>);
+					<% if @show_annotations && checkins.any? %>
+						data.setValue(<%=row%>, <%=(series*(@show_annotations?2:1)) + 2%>, <%= checkins.sort_by(&:checked_in_at).collect { |c| "<div class='checkin_detail'><b>#{c.login} @ #{c.checked_in_at.to_s(:time)}:</b> #{c.svn_log}</div>" }.join("\n").to_json %>);
+					<% end %>
+					<% row += 1 %>
+				<% end %>
+				<% series += 1 %>
+			<% end %>
+			var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('annotated_timeline_chart_div'));
+			chart.draw(data, {legendPosition: 'newRow', displayRangeSelector: <%=@show_annotations.to_json%>, displayAnnotations: <%=@show_annotations.to_json%>, annotationsWidth: 1, allowHtml: true, displayAnnotationsFilter: false, thickness: <%=@date_range.entries.size>150?1:2%>, colors: ['#3366CC', 'orange', 'red', 'green', 'purple', 'brown', 'gray', 'pink', 'yellow', 'blue', 'black', '#88BBEE', 'lightgreen', 'beige', 'lightblue', 'cyan', '#99C68E', '#AF7817', '#F660AB', '#817339', '#F88017', '#FFF380', '#5FFB17', '#54C571', '#736AFF', '#43BFC7', '#F9B7FF', '#893BFF', '#E3319D', '#C12869', '#98AFC7', '#2B547E', '#B5EAAA', '#667C26', '#7F5A58', '#FAF8CC', '#C031C7']});
+			google.visualization.events.addListener(chart, 'select', function() 
+				{
+					selection = chart.getSelection()[0];
+				 	$('#details_panel').html(data.getValue(selection.row, selection.column+1));
+				}
+			);
+		}
+		
+		function drawMotionChart()
+		{
+			var data = new google.visualization.DataTable();
+			//add entity column
+			data.addColumn('string', 'Contributor')
+			//add date column
+			data.addColumn('date', 'Date');
+			//add columns for various metrics
+			<% for metric in Metric.all_metrics %>
+				data.addColumn('number', '<%=metric.to_s.humanize%>')
+			<% end %>
+			data.addRows(<%=@date_range.entries.size * @selected_contributors.size%>);
+			<% row = 0 %>
+			<% for date in @date_range %>
+				<% @selected_contributors.sort.each do |contributor| %>
+					<% checkins_by_date = @checkins_by_contributor_by_date[contributor] || {} %>
+					<% checkins = checkins_by_date[date] || [] %>
+					data.setValue(<%=row%>, 0, '<%=contributor%>');
+					data.setValue(<%=row%>, 1, new Date(<%=date.year%>, <%=date.month-1%>,<%=date.day%>));
+					<% Metric.all_metrics.each_with_index do |metric, i| %>
+						data.setValue(<%=row%>, <%=i+2%>, <%=metric_value(metric, checkins)%>);
+					<% end %>
+					<% row += 1 %>
+				<% end %>
+			<% end %>
+			var chart = new google.visualization.MotionChart(document.getElementById('motion_chart_div'));
+      var options = {};
+			options['state'] = '{"xZoomedIn":false,"orderedByY":false,"xZoomedDataMax":4,"sizeOption":"4","dimensions":{"iconDimensions":["dim0"]},"orderedByX":false,"yZoomedDataMin":0,"yZoomedIn":false,"yLambda":1,"time":"2009-05-14","duration":{"multiplier":1,"timeUnit":"D"},"xLambda":1,"stateVersion":3,"yAxisOption":"2","showTrails":true,"iconKeySettings":[],"iconType":"BUBBLE","yZoomedDataMax":14,"xAxisOption":"5","playDuration":15,"nonSelectedAlpha":0.4,"colorOption":"_UNIQUE_COLOR","xZoomedDataMin":0}';
+			options['width'] = 620;
+			options['height'] = 300;
+			options['showSelectListComponent'] = true
+			chart.draw(data, options);
+		}
+	</script>
+<% end %>
+
+<div id="doc2" class="yui-t7">
+	<% form_for(@repository, :html => {:method => :get, :id => 'settings'}) do |f| %>
+		<!-- Header -->
+		<div id="hd" role="banner">
+			<table width="100%">
+				<tr>
+					<td>
+						<input name="date_range" type="text" value="<%=@start_date.strftime("%b %d, %Y")%> - <%=@end_date.strftime("%b %d, %Y")%>" id="date_range" />
+					</td>
+					<td style="text-align: right; vertical-align: top">
+						<h1 style="margin-bottom: 0;"><%=@repository.name%></h1>
+						<h3 style="color: #666; margin-top: 0; margin-bottom: 0;"><%=@repository.url%></h3>
+					</td>
+				</tr>
+			</table>
+				<div>
+					<div class="rounded_corners" id="select_contributors">
+						<%=link_to_function "Contributors: #{@selected_contributors==@all_contributors ? 'All' : @selected_contributors[0..15].join(', ') + (@selected_contributors.size > 15 ? " and others..." : "")}", "$('#contributors_dropdown').slideToggle();" %>
+						<div id="contributors_dropdown" style="display: none">
+							<table>
+								<% (@all_contributors).in_groups_of 10 do |contributors| %>
+									<tr>
+									<% for contributor in contributors.reject(&:blank?) %>
+										<td><%=check_box_tag "contributors[]", contributor,  @selected_contributors.include?(contributor)%> <%=contributor%></td>
+									<% end %>
+									</tr>
+								<% end %>
+								<tr>
+									<td><button class="btnDone ui-state-default ui-corner-all" style="display: inline;">Done</button></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+		</div>
+	
+		<!-- Body -->
+		<div id="bd" role="main">
+
+			<!-- Main Chart -->
+			<div class="yui-g">
+				<div class="section_header rounded_top_corners">
+					<div style="float: left; padding: 0; margin: 0; margin-top: -2px;">
+						<% metric_select_options = {'Checkins' => :checkins, 'File Impact' => :file_impact, 'Files per Checkin' => :files_per_checkin, 'Contributors' => :contributors} %>
+						<select name="metric" id="select_metric">
+							<% metric_select_options.each do |text, value| %>
+								<option value="<%=value%>"<%=" selected='selected'" if @selected_metric.to_s==value.to_s%>><%=text%></option>
+							<% end %>
+						</select>
+					</div>
+					<div style="text-align: right">
+						<%=check_box_tag "show_annotations", true, @show_annotations, :id => 'show_annotations'%> show details
+					</div>
+				</div>
+				<div id='annotated_timeline_chart_div' style='width: <%=@show_annotations ? '70%' : '98%'%>; height: 240px; <%=@show_annotations? "float: left;" : ""%>'></div>
+				<% if @show_annotations %>
+					<div id="details_panel" style="height: 240px">
+						<h2>Checkin Details</h2>
+						<div style="color: silver; margin-top: 85px; ">(select a marker to see the checkin details)</div>
+					</div>
+				<% end %>
+			</div>
+		
+			<div class="yui-gd">
+
+				<!-- Sparklines -->
+				<div class="yui-u first">
+					<div class="section_header rounded_top_corners">
+						Summary
+					</div>
+					<br/>
+
+					<table class="metrics_sparklines">
+						<tr>
+							<td><%=sparkline(@date_range.entries.collect{|date| metric_value(:checkins, @checkins_by_date[date] || [])})%></td>
+							<td class="number"><b><%=pluralize(metric_value(:checkins, @checkins), 'checkin')%></b></td>
+						</tr>
+						<tr>
+							<td><%=sparkline(@date_range.entries.collect{|date| metric_value(:file_impact, @checkins_by_date[date] || [])})%></td>
+							<td class="number"><b><%=pluralize metric_value(:file_impact, @checkins), 'file'%> impacted</b></td>
+						</tr>
+						<tr>
+							<td><%=sparkline(@date_range.entries.collect{|date| metric_value(:files_per_checkin, @checkins_by_date[date] || [])})%></td>
+							<td class="number"><b><%=pluralize metric_value(:files_per_checkin, @checkins), 'file'%>/checkin</b></td>
+						</tr>
+						<tr>
+							<td><%=sparkline(@date_range.entries.collect{|date| metric_value(:contributors, @checkins_by_date[date] || [])})%></td>
+							<td class="number"><b><%=pluralize metric_value(:contributors, @checkins), 'contributor'%></b></td>
+						</tr>
+					</table>
+				</div>
+
+				<!-- Motion Chart -->
+				<div class="yui-u">
+					<div class="section_header rounded_top_corners">
+						Contributor Activity
+					</div>
+					<div id="motion_chart_div"></div>
+				</div>
+
+			</div>
+		
+		</div>
+
+		<!-- Footer -->
+		<div id="ft" role="contentinfo">
+			<p>
+				<%= link_to 'Edit', edit_repository_path(@repository) %> |
+				<%= link_to 'Back', repositories_path %>
+			</p>
+		</div>
+	<% end %>
+</div>

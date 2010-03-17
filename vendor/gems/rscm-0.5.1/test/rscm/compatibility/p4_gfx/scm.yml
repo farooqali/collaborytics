@@ -1,0 +1,4 @@
+--- !ruby/object:RSCM::Perforce
+view: //depot/trunk/metrics/...
+username: Aslak.Hellesoy
+password: web40bof

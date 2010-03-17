@@ -1,0 +1,129 @@
+--- !ruby/object:RSCM::Revisions 
+revisions: 
+- !ruby/object:RSCM::Revision 
+  developer: aslak_hellesoy
+  files: 
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: .cvsignore
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.3"
+    path: CHANGES
+    previous_native_revision_identifier: "1.2"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.2"
+    path: README
+    previous_native_revision_identifier: "1.1"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.4"
+    path: Rakefile
+    previous_native_revision_identifier: "1.3"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.2"
+    path: lib/xforge.rb
+    previous_native_revision_identifier: "1.1"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.3"
+    path: lib/rake/contrib/xforge/release.rb
+    previous_native_revision_identifier: "1.2"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/version_parser.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: test/xforge/version_parser_specification.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  identifier: &id001 2005-08-12 03:22:09 Z
+  message: Added support for CHANGELOG parsing
+  time: *id001
+- !ruby/object:RSCM::Revision 
+  developer: aslak_hellesoy
+  files: 
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.4"
+    path: CHANGES
+    previous_native_revision_identifier: "1.3"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.5"
+    path: Rakefile
+    previous_native_revision_identifier: "1.4"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: xforge.tmproj
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.3"
+    path: lib/xforge.rb
+    previous_native_revision_identifier: "1.2"
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/scm_web/view_cvs.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/host.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/project.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/rubyforge.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/session.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/sourceforge.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/xfile.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: lib/xforge/xforge.rd
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: test/xforge/rubyforge_specification.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: test/xforge/sourceforge_specification.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: "1.1"
+    path: test/xforge/test_helper.rb
+    previous_native_revision_identifier: 
+    status: ADDED
+  identifier: &id002 2005-08-13 01:23:50 Z
+  message: refactored into seperate files and added scm support
+  time: *id002

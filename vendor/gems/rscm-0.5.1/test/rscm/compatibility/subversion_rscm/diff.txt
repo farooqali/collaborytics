@@ -1,0 +1,12 @@
+Index: cvs_log_parser_test.rb
+===================================================================
+--- cvs_log_parser_test.rb	(revision 155)
++++ cvs_log_parser_test.rb	(revision 156)
+@@ -201,6 +201,7 @@
+       expected_change.developer = "tirsen"
+       expected_change.message = "fixed some stuff in the log parser"
+       expected_change.native_revision_identifier =  "1.19"
++      expected_change.status =  "MODIFIED"
+       expected_change.time = Time.utc(2004, 7, 5, 9, 41, 51)
+       
+       assert_equal(expected_change, revisions[9][0])

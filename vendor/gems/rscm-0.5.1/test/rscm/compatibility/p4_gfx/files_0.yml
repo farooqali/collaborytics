@@ -1,0 +1,10 @@
+---
+- Metrix_Errors.yml
+- Metrix_SingletonDeclaration.yml
+- Metrix_SingletonUsage.yml
+- Suspicious_Builds.yml
+- cross.png
+- errors_html.xsl
+- suspicious_build_files.rb
+- suspicious_html.xsl
+- tick.png

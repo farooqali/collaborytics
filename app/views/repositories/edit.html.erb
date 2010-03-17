@@ -1,0 +1,32 @@
+<h1>Editing repository <%=@repository.url%></h1>
+
+<% form_for(@repository) do |f| %>
+  <%= f.error_messages %>
+	<table>
+		<tr>
+			<td>Name</td>
+			<td><%=f.text_field :name%></td>
+		</tr>
+		<tr>
+			<td>URL</td>
+			<td><%=f.text_field :url%></td>
+		</tr>
+		<tr>
+			<td>Username</td>
+			<td><%=f.text_field :username%> (leave blank for anonymous)</td>
+		</tr>
+		<tr>
+			<td>Password</td>
+			<td><%=f.text_field :password%> (leave blank for anonymous)</td>
+		</tr>
+		<tr>
+			<td><%= f.check_box :enabled %> Enabled</td>
+		</tr>
+	</table>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @repository %> |
+<%= link_to 'Back', repositories_path %>

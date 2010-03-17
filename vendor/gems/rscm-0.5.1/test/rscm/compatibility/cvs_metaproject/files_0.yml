@@ -1,0 +1,13 @@
+--- 
+- CHANGES
+- MIT-LICENSE
+- README
+- Rakefile
+- TODO
+- doc/base_attrs.rdoc
+- lib/rake/contrib/xforge.rb
+- lib/rake/contrib/xforge/base.rb
+- lib/rake/contrib/xforge/release.rb
+- lib/xforge.rb
+- lib/xforge/version_parser.rb
+- test/xforge/version_parser_specification.rb

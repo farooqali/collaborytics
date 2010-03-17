@@ -1,0 +1,86 @@
+--- !ruby/object:RSCM::Revisions 
+revisions: 
+- !ruby/object:RSCM::Revision 
+  developer: aslak
+  files: 
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 156
+    path: rscm/compatibility/damage_control_minimal.rb
+    previous_native_revision_identifier: 155
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 156
+    path: rscm/compatibility/full.rb
+    previous_native_revision_identifier: 155
+    status: MOVED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 156
+    path: rscm/generic_scm_tests.rb
+    previous_native_revision_identifier: 155
+    status: DELETED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 156
+    path: rscm/scm/cvs_log_parser_test.rb
+    previous_native_revision_identifier: 155
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 156
+    path: rscm/scm/cvs_test.rb
+    previous_native_revision_identifier: 155
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 156
+    path: rscm/scm/perforce_test.rb
+    previous_native_revision_identifier: 155
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 156
+    path: rscm/scm/subversion_test.rb
+    previous_native_revision_identifier: 155
+    status: MODIFIED
+  identifier: 156
+  message: reorganisations for compat suites
+  time: 2006-03-03 17:55:54 Z
+  to_s: |
+    156 | aslak | Fri Mar 03 17:55:54 UTC 2006 | reorganisations for compat suites
+     rscm/compatibility/damage_control_minimal.rb | 156
+     rscm/compatibility/full.rb | 156
+     rscm/generic_scm_tests.rb | 156
+     rscm/scm/cvs_log_parser_test.rb | 156
+     rscm/scm/cvs_test.rb | 156
+     rscm/scm/perforce_test.rb | 156
+     rscm/scm/subversion_test.rb | 156
+
+- !ruby/object:RSCM::Revision 
+  developer: aslak
+  files: 
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 157
+    path: rscm/compatibility/damage_control_minimal.rb
+    previous_native_revision_identifier: 156
+    status: MODIFIED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 157
+    path: rscm/compatibility/subversion_rscm/files.yml
+    previous_native_revision_identifier: 156
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 157
+    path: rscm/compatibility/subversion_rscm/revisions.yml
+    previous_native_revision_identifier: 156
+    status: ADDED
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 157
+    path: rscm/compatibility/subversion_rscm/scm.yml
+    previous_native_revision_identifier: 156
+    status: ADDED
+  identifier: 157
+  message: Added settings for subversion dc compat test
+  time: 2006-03-03 18:24:07 Z
+  to_s: |
+    157 | aslak | Fri Mar 03 18:24:07 UTC 2006 | Added settings for subversion dc compat test
+     rscm/compatibility/damage_control_minimal.rb | 157
+     rscm/compatibility/subversion_rscm/files.yml | 157
+     rscm/compatibility/subversion_rscm/revisions.yml | 157
+     rscm/compatibility/subversion_rscm/scm.yml | 157
+

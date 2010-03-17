@@ -1,0 +1,3 @@
+--- !ruby/object:RSCM::Cvs
+root: ":pserver:anonymous@rubyforge.org:/var/cvs/xforge"
+mod: xforge

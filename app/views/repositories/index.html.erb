@@ -1,0 +1,24 @@
+<% @repositories.each do |repository| %>
+		<div class="repository rounded_corners">
+			<table width="100%">
+				<td style="width: 80%; float: left">
+					<a href="<%=repository_path(repository)%>">
+						<h1 style=""><%=repository.name%></h1>
+						<h3 style=""><%=repository.url%></h3>
+					</a>
+				</td>
+				<td style="text-align: right">
+					<div>
+						<% if repository.enabled? %>
+							<%=image_tag("connect.png")%> <span style="color: darkgreen; font-weight: bold">Listening for updates</span>
+						<% else %>
+						 	<%= image_tag("disconnect.png") %> <span style="color: maroon; font-weight: bold">Don't listen for updates</span>
+						<% end %>
+					</div>
+			    <span><%= link_to 'View', repository %></span>
+			    <span><%= link_to 'Edit', edit_repository_path(repository) %></span>
+			    <span><%= link_to 'Delete', repository, :confirm => 'Are you sure?', :method => :delete %></span>
+				</td>
+			</table>
+		</div>
+<% end %>

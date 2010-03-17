@@ -1,0 +1,7 @@
+require File.dirname(__FILE__) + '/../config/environment'
+
+Repository.find_all_by_enabled(true).each do |repository|
+  puts "Discovering checkins for repository #{repository.url}"
+  checkins = repository.discover_checkins
+  puts "\nDiscovered #{checkins.size} checkins"
+end

@@ -1,0 +1,48 @@
+= XForge Changelog
+
+== Version 0.1.4
+
+This is the first functional release of XForge, a Ruby library and Rake task to automate release of
+files on RubyForge and other SourceForge clones.
+
+It's as simple as this:
+
+require 'xforge'
+
+desc "Create a new release on RubyForge"
+task :publish_files => [:gem] do
+  release_files = FileList[
+    "pkg/#{PKG_FILE_NAME}.gem"
+  ]
+
+  Rake::XForge::Release.new(PKG_NAME) do |release|
+    # Never hardcode user name and password in the Rakefile!
+    release.user_name = ENV['RUBYFORGE_USER']
+    release.password = ENV['RUBYFORGE_PASSWORD']
+    release.files = release_files.to_a
+    release.release_name = "XForge #{PKG_VERSION}"
+    # The rest of the options are defaults (among others, release_notes and release_changes, parsed from CHANGES)
+  end
+end
+
+* Added logic for parsing of CHANGES files and include it in the release notes when publishing.
+* Wrote some proper release notes for once.
+
+== Version 0.1.3
+
+* Added logic for parsing of CHANGES files and include it in the release notes when publishing.
+
+== Version 0.1.2
+
+This release is a minor release with fixes in the Rake script.
+
+* Fixed RDoc for gem
+* Cleaned up documentation
+
+== Version 0.1.1
+
+* Rakefile: Don't include old gems in release.
+
+== Version 0.1
+
+* Added support for file releases

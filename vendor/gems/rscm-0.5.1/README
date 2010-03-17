@@ -1,0 +1,218 @@
+= RSCM - Ruby Source Control Management (0.5.1)
+
+RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing different SCMs. The high level features are roughly:
+
+* Check out a working copy (with possibility to specify branch/date/label)
+* Get revisions (changesets) (Emulated for non-transactional SCMs like CVS, ClearCase and StarTeam)
+* Get diffs
+* Add and commit files
+* Manipluate triggers
+
+Although RSCM's main focus is operations on a working copy of an SCM repository, 
+the API also allows some level of interaction with the SCM repository itself, 
+like creating new repositories.
+
+== Download
+
+RSCM is available as a RubyGem, and can be installed like this:
+
+  gem install rscm
+
+(You may need administrator access to do this on a POSIX system). You can also download prebuilt gems from
+http://rubyforge.org/frs/?group_id=490
+
+If you want the latest and greatest, you can get the sources from subversion:
+
+  svn co svn://buildpatterns.com/svn/repos/rscm/trunk
+
+== Contributors
+
+* Aslak Hellesoy - All
+* Steven Baker - Monotone
+* Jon Tirsen - CVS, Subversion
+* Yogi Kulkarni - Perforce
+
+== Supported SCMs
+
+* CVS - http://www.nongnu.org/cvs (stable)
+* Subversion - http://subversion.tigris.org (stable)
+
+In progress:
+
+* ClearCase - http://www-306.ibm.com/software/awdtools/clearcase (not thoroughly tested)
+* Darcs - http://www.abridgegame.org/darcs (very incomplete)
+* Monotone - http://www.venge.net/monotone (half complete)
+* Perforce - http://www.perforce.com (nearly complete - a little out of date with recent API)
+* StarTeam - http://www.borland.com/starteam (nearly complete - a little out of date with recent API)
+
+Planned:
+
+Loads! All of them! How to add support for a new one is described further down in this file.
+
+== Related projects
+
+* DamageControl - http://dev.buildpatterns.com/trac/wiki/DamageControl (Continuous Integration system
+built on top of RSCM and Ruby on Rails).
+
+== Sample usage
+
+Here is an example of how to use RSCM to get a list of revisions (aka changesets) from a subversion repository:
+
+  require 'rscm'
+  
+  scm = RSCM::Subversion.new("svn://some.server/some/path/trunk")
+  # What follows would look the same for any supported SCM
+  revisions = scm.revisions(Time.utc(2004, 11, 10, 12, 34, 22)) # For Subversion, you can also pass a revision number (int)
+  revisions.each do |revision|
+    puts revision # or do something more funky with it
+  end
+
+== Future plans
+
+=== Cross-SCM synchronisation
+RSCM could be used as a tool to migrate files from one SCM to another (of a different type)
+while keeping the history. -Similar to cvs2svn or http://nautilus.homeip.net/~lele/projects/tailor/
+
+RSCM could also be used as a continuous synchronisation service between SCMs. This can be very useful
+when you have to work with an SCM and you'd rather use a different one. RSCM could synchronise between
+the central SCM and one that you set up on your local machine.
+
+=== SCM browser
+A rails webapp that allows browsing of a repository, using RSCM to access it. -Perhaps even with a simple
+editor allowing people to modify files and commit them via the browser.
+
+= Implementing a new RSCM adapter
+
+If you want RSCM to support a new SCM, you must implement a subclass of RSCM::Base.
+You should focus on implementing only the features that you need. For example, if
+you plan to use your new RSCM adapter with DamageControl, you only need to implement
+the parts of the API that are used by DamageControl.
+
+We'll see what steps are needed to make an adapter that passes the DamageControl compatibility suite
+(which is part of RSCM). Let's imagine we want DamageControl to be able to work with the imaginary SCM 
+called Mooky. The rest of this section explains how to get started. You're going to need a preexisting
+repository with some existing contents, basic knowledge of the SCM's command line tools and some Ruby
+programming skills.
+
+== Create the test class and the implementation class
+
+Start by writing a test that includes the compatibility test suite you're interested in:
+
+  test/rscm/scm/mooky_test.rb
+
+With the following content:
+
+  require 'rscm/test_helper'
+
+  module RSCM
+    class MookyTest < Test::Unit::TestCase
+      include Compatibility::DamageControlMinimal
+    end
+  end
+
+Now create the implementation class:
+
+  lib/rscm/scm/mooky.rb
+
+With the following content:
+
+  require 'rscm/base'
+
+  module RSCM
+    class Cvs < Base
+    end
+  end
+
+Now that we have set up the basics, we can run the tests:
+
+  rake test TEST=test/rscm/scm/mooky_test.rb
+
+It will fail - there is still some setup to do:
+
+== Create testdata directory
+You must create a new directory under test/rscm/compatibility to contain testdata. Give it a name representative 
+of the scm type and the contents of the scm. For example, if the existing mooky repository we're going to test 
+against contains source code for a chess engine, we could call the directory test/rscm/compatibility/mooky_chess.
+
+Also add an entry in test/rscm/compatibility/config.yml mapping your test class to the testdata directory.
+
+The DamageControl compatibility suite expects to find three YAML files in this directory, scm.yml, revisions.yml
+and files_0.yml.
+
+=== Create scm.yml 
+This file should contain a YAML representation of the SCM instance used for testing. The test suite will load it to create an instance of your class. You're free to use whatever properties you want in your SCM implementation, and the YAML file should
+contain the necessary values to connect to the preexisting repository.
+
+=== Create revisions.yml
+This file should contain a RSCM::Revisions object with two RSCM::Revision objects. You can start off by making a copy of one of the
+existing revisions.yml files, but you should hand-edit this file to represent two revisions in the existing repository.
+
+You cannot choose any revision though. There are some constraints that need to be followed:
+* There must be exactly two RSCM::Revision objects
+* The two RSCM::Revision objects must represent to adjacent revisions from the repository
+* Each of the RSCM::Revision objects must contain at least two RSCM::RevisionFile objects
+* The second RSCM::Revision object must contain at least one RSCM::RevisionFile with "ADDED" state
+
+Given these constraints you should spend some time locating two revisions that follow these constraints.
+This would be a good time to familiarize yourself with the SCM's command line tool (or whatever kind of tool
+the SCM provides to access it).
+
+==== Special note for non-transactional SCMs
+
+Non-transactional SCMs usually use dates (and not revision identifiers) to report changes. Most SCMs report changes to files
+(which will become RSCM::RevisionFile instances) in some sort of log. These changes will typically not be logically 
+grouped. RSCM::Revisions.add will group revision files that have:
+* similar modification time (max 1 minute apart)
+* the same commit message
+* the same developer
+
+So when mining for revisions that follow the constraints for revisions.yml, you should also be looking for groupings
+in modification time, commit message and developer.
+
+=== Create files_0.yml
+This file should contain the files that will be in the working copy after a checkout of the 1st revision in revisions.yml,
+sorted by their path.
+
+=== Create old.yml
+This file should contain a start time and all the revision identifiers before that time. 
+The start time should be a carefully selected timestamp close to the start of the scm.
+"identifiers" should be a list of all identifiers from the beginning of time up until 
+the start identifier.
+
+=== Create diff.txt
+This file should contain a diff. It should be the diff of the first revision file in revisions.yml - 
+between its native_revision_identifier and the previous_revision_identifier.
+
+=== Create file.txt
+This file should contain the contents of the first revision file in revisions.yml (at the revision
+specified by native_revision_identifier).
+
+== Implement the methods
+Now that we have set up everything needed for the tests, we can run the tests again:
+
+  rake test TEST=test/rscm/scm/mooky_test.rb
+
+Now you should get errors about methods not being implemented. At this point you should start implementing the methods.
+
+== Implementation tips
+* Run the tests often. Let the error messages guide you in what you do next.
+* Use the execute method to invoke command line tools.
+* Split the implementation into two classes. One class for parsing logs and one for translating API calls to command line executions. This will allow you to test the log parsing against hard coded logs in your tests.
+
+= Building RSCM
+This section is for developers who are new to ruby development and do not already know how to build and install Ruby gems.
+
+You need to install rubygems from http://rubyforge.org/projects/rubygems
+Afterwards you need to install rake and rails
+
+  gem install rake
+
+Now change to the RSCM root directory and type
+
+  rake gem
+
+This will create a gem for RSCM. To install this gem, you have to change to the pkg directory and type
+
+  sudo gem install pkg/rscm-0.4.X.gem
+  
+Now you can use RSCM in other Ruby apps with a simple require 'rscm'.

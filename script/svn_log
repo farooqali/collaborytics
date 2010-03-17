@@ -1,0 +1,21 @@
+require 'rubygems'
+require 'rscm'
+
+scm = RSCM::Subversion.new "http://svn2.assembla.com/svn/fangorn/trunk/fangorn"
+scm.username = 'faro00oq'
+scm.password = '95146krdfhsatrt'
+
+revision_numbers = 1..4#scm.send(:head_revision_identifier, {})
+revision_numbers.collect do |revision_number| 
+  revisions = scm.revisions(revision_number)
+  puts "got #{revisions.length} revisions"
+  if revisions[0].nil?
+    puts "nil revision for #{revision_number}"
+  else
+    puts "#{revisions[0].identifier}. #{revisions[0].developer} (#{revisions[0].time}): #{revisions[0].message}"
+    revisions[0].each do |x| 
+      puts "  " + x.status.to_s + " " + x.to_s
+      x.diff(scm)
+    end
+  end
+end

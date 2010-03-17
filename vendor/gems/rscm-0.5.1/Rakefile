@@ -1,0 +1,142 @@
+require 'rubygems'
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
+require 'rake/packagetask'
+require 'rake/gempackagetask'
+require 'rake/contrib/sshpublisher'
+require 'rake/contrib/rubyforgepublisher'
+require 'lib/rscm/version'
+
+PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
+PKG_NAME      = 'rscm'
+PKG_VERSION   = RSCM::VERSION::STRING + PKG_BUILD
+PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
+
+task :default => [:test, :gem]
+
+# Run the unit tests
+# To run a specific test: rake test TEST=path/to/test
+fl = FileList.new('test/**/*_test.rb')
+fl.exclude('test/**/mooky*.rb')
+fl.exclude('test/**/monotone*.rb') 
+fl.exclude('test/**/clearcase*.rb')
+fl.exclude('test/**/p4client*.rb') 
+fl.exclude('test/**/darcs*.rb') 
+Rake::TestTask.new { |t|
+  t.libs << "test"
+  t.test_files = fl
+  t.verbose = true
+  
+  # turn on code coverage
+  #t.ruby_opts << "-rcoverage/coverage"
+}
+
+rd = Rake::RDocTask.new { |rdoc|
+  rdoc.title    = 'RSCM - Ruby Source Control Management API'
+  rdoc.options << '--line-numbers' << '--inline-source'
+  rdoc.rdoc_files.include('README')
+  rdoc.rdoc_files.include('CHANGES')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+  rdoc.rdoc_files.include('docs/**/*.rd')
+}
+
+PKG_FILES = FileList[
+  '[A-Z]*',
+  'lib/**/*', 
+  'bin/**/*', 
+  'test/**/*',
+  'testproject/**/*',
+  'doc/**/*',
+  'ext/rscm.jar'
+]
+
+if ! defined?(Gem)
+  puts "Package Target requires RubyGEMs"
+else
+  spec = Gem::Specification.new do |s|
+    
+    #### Basic information.
+
+    s.name    = PKG_NAME
+    s.version = PKG_VERSION
+    s.summary = "RSCM - Ruby Source Control Management"
+    s.description = <<-EOF
+      RSCM is a Ruby library for various Source Control Management (SCM) systems.
+    EOF
+
+    #### Which files are to be included in this gem?  Everything!  (Except CVS directories.)
+
+    s.files = PKG_FILES.to_a
+
+    #### Load-time details: library and application (you will need one or both).
+
+    s.require_path = 'lib'
+    s.autorequire = 'rscm'
+
+    #### Documentation and testing.
+
+    s.has_rdoc = true
+    s.extra_rdoc_files = rd.rdoc_files.reject { |fn| fn =~ /\.rb$/ }.to_a
+    rd.options.each do |op|
+      s.rdoc_options << op
+    end
+
+    #### Author and project details.
+
+    s.author = "Aslak Hellesoy"
+    s.email = "dev@damagecontrol.codehaus.org"
+    s.homepage = "http://rscm.rubyforge.org"
+    s.rubyforge_project = "rscm"
+  end
+
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.need_zip = true
+    pkg.need_tar = true
+  end
+end
+
+task :release => [:verify_env_vars, :release_files, :publish_doc, :publish_news]
+
+task :verify_env_vars do
+  raise "RUBYFORGE_USER environment variable not set!" unless ENV['RUBYFORGE_USER']
+  raise "RUBYFORGE_PASSWORD environment variable not set!" unless ENV['RUBYFORGE_PASSWORD']
+end
+
+desc "Release files on RubyForge"
+task :release_files => [:gem] do
+  require 'meta_project'
+  release_files = FileList[
+    "pkg/#{PKG_FILE_NAME}.gem"
+  ]
+
+  Rake::XForge::Release.new(MetaProject::Project::XForge::RubyForge.new(PKG_NAME)) do |release|
+    # Never hardcode user name and password in the Rakefile!
+    release.user_name = ENV['RUBYFORGE_USER']
+    release.password = ENV['RUBYFORGE_PASSWORD']
+    release.files = release_files.to_a
+    release.release_name = PKG_FILE_NAME
+    # The rest of the options are defaults (among others, release_notes and release_changes, parsed from CHANGES)
+  end
+end
+
+desc "Publish docs/website"
+task :publish_doc => [:rdoc] do
+  require 'meta_project'
+  publisher = Rake::RubyForgePublisher.new(PKG_NAME, ENV['RUBYFORGE_USER'])
+  publisher.upload
+end
+
+desc "Publish news on RubyForge"
+task :publish_news => [:gem] do
+  require 'meta_project'
+  release_files = FileList[
+    "pkg/#{PKG_FILE_NAME}.gem"
+  ]
+
+  Rake::XForge::NewsPublisher.new(MetaProject::Project::XForge::RubyForge.new(PKG_NAME)) do |news|
+    # Never hardcode user name and password in the Rakefile!
+    news.user_name = ENV['RUBYFORGE_USER']
+    news.password = ENV['RUBYFORGE_PASSWORD']
+  end
+end

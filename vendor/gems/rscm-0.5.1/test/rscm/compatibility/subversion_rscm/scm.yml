@@ -1,0 +1,3 @@
+--- !ruby/object:RSCM::Subversion
+url: http://buildpatterns.com/svn/repos/rscm/trunk/test
+path: rscm/trunk/test

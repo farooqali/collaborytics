@@ -1,0 +1,24 @@
+--- !ruby/object:RSCM::Revisions 
+revisions: 
+- !ruby/object:RSCM::Revision 
+  developer: Aslak.Hellesoy
+  files: 
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 5
+    path: suspicious_html.xsl
+    previous_native_revision_identifier: 4
+    status: MODIFIED
+  identifier: 26109
+  message: "\twords"
+  time: 2006-03-08 22:10:11 Z
+- !ruby/object:RSCM::Revision 
+  developer: Aslak.Hellesoy
+  files: 
+  - !ruby/object:RSCM::RevisionFile 
+    native_revision_identifier: 1
+    path: rules/README.txt
+    previous_native_revision_identifier: 0
+    status: ADDED
+  identifier: 26117
+  message: "\tPlaceholder for rules"
+  time: 2006-03-08 23:22:51 Z

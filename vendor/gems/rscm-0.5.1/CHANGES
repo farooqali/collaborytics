@@ -1,0 +1,198 @@
+= RSCM Changelog
+
+== 0.5.1
+Bugfix release.
+
+* Fixed a bug causing bad commands in conjunction with a block not to fail. They now fail correctly.
+
+== 0.5.0
+This release improves command line and logging, as well as improved support for slurping all historic revisions incrementally (to save memory). The latter will be improved in upcoming versions.
+
+* Diffing and opening specific files is now part of the rscm_engine/damagecontrol compatibility test
+* The interface of RSCM::Base.diff has changed to take a path and two revision identifiers.
+* Different timezones for client and server are now (hopefully) properly handled for Perforce.
+* Made RSCM::Base.execute not do a chdir unless it's needed (makes direct usage from a Rails app more feasable).
+* Fixed broken pipe error for CVS triggers.
+* Store the commandline used to retrieve revisions in the Revisions object (useful for debugging).
+* New RSCM::Base.poll method that yields revisions incrementally from a start date (backwards or forwards in time).
+* Removed RSCM::Base.file and RSCM::HistoricFile - too hard to implement correctly across SCMs and too little value.
+
+== 0.4.5
+This is a minor bugfix release that corrects the tests for command_line.rb to work on win32
+
+* made tests for command_line.rb pass on win32
+
+== 0.4.4
+This release introduces a new test suite that makes it a LOT easier to implement
+new RSCM adapters. The main difference is that implementations no longer have to
+implement the entire API. There are two test suites - one for the full API, and
+one for DamageControl (which is only a small subset of the full API).
+
+New RSCM adapters can be written only to pass the DamageControl compatibility suite,
+which requires a much smaller effort than implementing the full API. The DamageControl
+compatibility suite assumes there is an existing repository somewhere, and none of
+the API methods that modify repository state need to be implemented.
+
+* Added damagecontrol compatibility suite
+* RSCM::Base.default_options now defaults to {}
+* Fixed bug that would cause a bad commandline when stdout is not specified and a block is passed.
+
+== 0.4.3
+
+This release fixes a subtle bug in revision detection for Subversion
+
+* Reintroduced the path parameter for svn log parser. It will be used as a fallback if a file path cannot be determined from looking at the URL. A RSCM::Subversion object with a URL pointing to the root of the repo *MUST* also specify path="", otherwise no files will be detected in the revisions. Instances with URLs that represent a subdirectory of the root URL don't need to specify path, unless the instance is used to install/uninstall triggers - or to create repositories.
+
+== 0.4.2
+
+This release fixes a number of subtle bugs related to command lines and logging
+
+* Subversion no longer adds 1 to the from_identifier when getting revisions (avoid stderr and exitcode -1)
+* Improved tests and documentation for CommandLine class
+* stdout and stderr options are now optional
+* Fixed incorrect path escaping on win32
+* Fixed broken CVS trigger mechanism
+
+== Version 0.4.1
+
+* Minor subversion improvements. Fixes #1 [aslak]
+
+== Version 0.4.0
+
+This release of RSCM modifies mosts API methods to take an options Hash (or alternatively, setting
+the default_options attribute), allowing better capturing of the underlying SCM's IO (stdout/stderr)
+
+* Introduced named parameters for several API methods.
+* Added RSCM::VERSION
+* Fixed incorrect arguments to poll_new_revisions in revision_poller.rb
+* Added Base.to_identifier(raw_identifier) for type conversion to the native revision type.
+* Removed support for directory listings (No use case for it anymore, keep things simpler)
+* checkout no longer yields new files, only returns an array (primarily used for testing)
+* Better.popen removed in favour of RSCM::CommandLine.
+* Stdout and stderr logs are now written to disk.
+
+== Version 0.3.16
+
+Bugfix release
+
+* Added some minor checks for file history
+* Documented Base.open
+
+== Version 0.3.15
+
+This release adds support for directory listings and fixes some incompatibilities with CVS 1.12.x
+
+* Added support for directory listings.
+* Added support for parsing of revisions for CVS 1.12.x, which uses a slightly different time format.
+
+== Version 0.3.14
+
+Improved error messages
+
+* Subversion and CVS now raise detailed instructions on how to install triggers in case of failure.
+
+== Version 0.3.13
+
+Improved trigger support
+
+* Added Base.trigger_mechanism and implementation for subclasses that support triggering.
+* Removed Subversion.to_yaml_properties, which prevented additional attributes.
+
+== Version 0.3.12
+
+Bugfix release
+
+* Made Mockit setup/teardown work with other setup/teardown extensions
+
+== Version 0.3.11
+
+Cleanup release
+
+* Added atomic? alias for transactional?
+* Removed annotations, too magic :-)
+* Removed Base.classes - not needed.
+* Removed logging
+* Fixes in the README
+
+== Version 0.3.10
+
+Bugfix release
+
+* Removed DamageControl leftovers in revision_poller 
+
+== Version 0.3.9
+
+This release improves Subversion and ClearCase support
+
+* Subversion no longer needs a working copy to get revisions and diffs
+* Misc. ClearCase improvements
+* Added RSCM::Base.destroy_working_copy
+
+== Version 0.3.8
+
+Bugfix release
+
+* Reshuffled supported SCMs
+* Made ClearCase ctor params optional
+
+== Version 0.3.7
+
+This release improves polling of revisions (changesets) and improves ClearCase support
+
+* Added RSCM.Base.poll_new_revisions (moved from DamageControl)
+* Rewrote the ClearCase adapter. There are no tests for ClearCase yet - tested manually.
+
+== Version 0.3.6
+
+Bugfix release
+
+* Subversion password was defined twice - fixed.
+
+== Version 0.3.5
+
+This release adds new API methods for accessing files and their revisions and contents.
+
+* Added new scm.history_file method (returning RSCM::HistoryFile).
+* Added RSCM::HistoryFile.revision_files methods to get all revisions of a file.
+* Added RSCM::RevisionFile.open to get the contents of a specific revision of a file.
+* Set defaults for Subversion username/password
+* Removed logging code (may reintroduce later if I come up with a better way to configure it)
+
+== Version 0.3.4
+
+This release fixes some bugs on windows.
+
+* Removed redirection to dev/null for CVS commands. 2>nul didn't seem to work on windows.
+* Fixed the path to touch.exe (needed in tests)
+
+== Version 0.3.3
+
+This release makes some test utilities more reusable.
+
+* Added optional basedir parameter to assert_equal_with_diff
+
+== Version 0.3.2
+
+This is a bugfix release.
+
+* Moved difftool_test.rb and tempdir.rb from test to lib (damagecontrol's tests are using it)
+
+== Version 0.3.1
+
+This is a bugfix release.
+
+* Added move method to Subversion, CVS, Monotone and Perforce (although it doesn't work on the latter two)
+* SCM classes no longer include FileUtils (conflicted with new move method)
+* Fixed DC-427 (couldn't parse regexp chars *,+ and ? in subversion logs)
+
+== Version 0.3.0
+
+* Removed checkout_dir from all methods. It's now a mandatory attribute on the SCM objects.
+* Made logging more pluggable
+
+== Version 0.2.1
+
+* Implemented add method for monotone
+* Fixed monotone test and added some doco
+* Add server and port options to Monotone::initialize
+* Added changelog file

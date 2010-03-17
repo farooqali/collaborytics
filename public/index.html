@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title>Collaborytics: Overview</title>
+  <link rel="stylesheet" href="/stylesheets/reset-fonts-grids.css"
+ type="text/css">
+  <link rel="stylesheet" href="/stylesheets/scaffold.css"
+ type="text/css">
+</head>
+<body style="padding: 0 0 5px 0;">
+<div style="height:80px; border-bottom: 2px solid #777; background: orange; padding: 5px">
+	<h1>Collaborytics: Overview</h1>
+	<a href="/repositories"><h4 style="0px">Go to Collaborytics &gt;</h4></a>
+</div>
+<table>
+	<tbody>
+		<tr>
+			<td style="vertical-align: top; padding-left: 10px;" width="50%">
+				
+				<p>Collaborytics is an analytics and visualization application for
+				source code management systems. It's aim is to assist software
+				development teams, architects, consultants and project managers to
+				visualize various metrics that apply to software development projects.
+				Strictly speaking, the repository being visualized doesn't have to be a
+				source code repository, but could be a repository for, say,
+				book-writing
+				authors too.</p>
+				<br>
+				<p>Collaborytics helps users gain any useful information about a team's
+				adherence to
+				good <a href="http://en.wikipedia.org/wiki/Revision_control">Source
+				Code Management (SCM) </a>practices--such as <a
+				 href="http://www.extremeprogramming.org/rules/integrateoften.html">small
+				and frequent checkins</a>--and good <a
+				 href="http://www.extremeprogramming.org/rules.html">Extreme
+				Programming
+				(XP) practices</a>--such as <a
+				 href="http://www.extremeprogramming.org/rules/pair.html">pair rotations</a>
+				and <a href="http://www.extremeprogramming.org/rules/collective.html">collective
+				code ownership</a>--by analyzing the evolution of a codebase in a
+				repository over time.<br>
+				<br>
+				The motivation is to visualize metrics that developers, technical leads
+				and consultants like myself will find useful for gaining insight into
+				their software development process. For example, a popular social
+				coding service, <a href="http://www.github.com/">GitHub</a>, has some
+				graphs to visualize <a
+				 href="http://github.com/madrobby/scriptaculous/graphs/impact">"Code
+				Impact"</a> (lines added + lines deleted for all non-merge commits
+				during a given timeframe) and <a
+				 href="http://github.com/madrobby/scriptaculous/graphs/punch_card">commit
+				activity by day and hour</a>.<br>
+				</p>
+				<br>
+				<p>The questions that the minimum feature set
+				answers are:<br>
+				- How active is each contributor/developer?<br>
+				- Are the contributors/developers making small and frequent changes or
+				otherwise? (<a
+				 href="http://www.extremeprogramming.org/rules/integrateoften.html">More
+				info on XP best practice of small and frequent checkins</a>.)<br>
+				- What are the trends and outliers in file impact and files/checkin
+				over time?<br>
+				- What is the contribution level (# of unique contributors) for
+				different time periods (or iterations)?<br>
+				- How do the various metrics relate to each other (exploration of
+				multidimensional metrics)?<br>
+				<br>
+				Some of the questions I would like to answer with the visualization in
+				the future are:<br>
+				- What are the most/least active areas of the codebase?<br>
+				- Is there a good dispersion of code ownership amongst the developers? <br>
+				- Who has more experience in what parts of the codebase?<br>
+				- What are the trends in line impact and lines/checkin? This provides a
+				lower level of granularity <br>
+				<br>
+				In the future, I would also like to incorporate other metrics such as <a
+				 href="http://ruby.sadi.st/Flog.html">flog scores</a>, <a
+				 href="http://erik.doernenburg.com/2008/11/how-toxic-is-your-code/">toxicity</a>
+				and <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity">cyclomatic
+				complexity</a>, but at the moment
+				I'm more interested in spotting trends emerging from source control
+				activity. Needless to say, we should always take software metrics with
+				a grain of salt. I find them particularly useful in spotting trends and
+				outliers and not in arriving at black or white conclusions.</p>
+			</td>
+			
+			<td style="vertical-align: top; background: #DEDEDE; border-top: 10px solid #888; border-bottom: 10px solid #888; border-left: 10px solid #888;">
+				<div style="text-align: center">
+					<br/>
+					<a href="/images/Picture%2020.png">
+						<img src="/images/Picture%2020%20thumbnail.png" />
+						<div style="font-size: 12px; font-weight: bold">Metric Timeline</div>
+					</a>
+					<br/>
+					<a href="/images/Picture%2021.png">
+						<img src="/images/Picture%2021%20thumbnail.png" />
+						<div style="font-size: 12px; font-weight: bold">Summary and Motion Chart</div>
+					</a>
+					<br/>
+					<a href="/images/Picture%2023.png">
+						<img src="/images/Picture%2023%20thumbnail.png" />
+						<div style="font-size: 12px; font-weight: bold">Annotated Timeline with Checkin Details</div>
+					</a>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+	
+</table>
+</body>
+</html>

@@ -1,0 +1,87 @@
+[13:18] bluebum: hmmm...i'm sorry, then i have fsfs , since I just chose the default format and I had 1.2.3
+[13:18] Tlaloc: Unless you'd read up extensivley on both bdb and fsfs and you know you need bdb for some reason I'd stick with fsfs
+[13:18] aslak: hi there - i am about to post a bug report for svn log, and want to verify it here first
+[13:18] Tlaloc: If you have fsfs you can just tar up or rsync the repo from one box to the other
+[13:19] bluebum: Tlaloc ; really? that easy ?
+[13:19] Tlaloc: But ou might still want to dump load when going to 1.3.0
+[13:19] Stric: bluebum: just do a dump&load, then everything will be fine.. no matter what you have right now.
+[13:19] aslak: if i do: svn log http://buildpatterns.com/svn/repos/rscm/trunk/test/ --revision 156:{"2006-03-03 18:24:08"}
+[13:19] bluebum: oh ok
+[13:19] Tlaloc: since 1.3.0 uses xdelta instead of ydelta for diffs
+[13:19] bluebum: i see
+[13:19] aslak: - i get a log of 2 revisions
+[13:19] Tlaloc: so you'll get slightly better performance for blame and some other commands
+[13:19] bluebum: thanks Tlaloc  and Stric
+[13:20] aslak: if i now execute: svn log http://buildpatterns.com/svn/repos/rscm/trunk/test/ --revision {"2006-03-03 11:55:55"}:{"2006-03-03 18:24:08"}
+[13:20] aslak: i get log entries that are outside the lower bounds
+[13:21] aslak: can anyone explain why i get log entries outside the bounds? is this a bug?
+[13:22] aslak: (i'm on svn 1.2.3)
+[13:23] darix: Tlaloc: vdelta. not ydelta
+[13:23] Tlaloc: darix: right
+[13:23] kfogel: aslak: are the dates on your revisions only ascending, or are there "reset" (say, due to cvs2svn dumpfiles being important or something)?
+[13:24] Tlaloc: <letter other than x>delta
+[13:24] kfogel: s/reset/resets/
+[13:24] aslak: kfogel: this is a clean repo (on textdrive) - no cvs2svn.
+[13:25] kfogel: oh, I thought it might be http://subversion.tigris.org/issues/show_bug.cgi?id=752
+[13:25] kfogel: I have no idea what the problem is, then.
+[13:25] urkle__ left the chat room. (Read error: 104 (Connection reset by peer))
+[13:25] kfogel: (the drive the repos is on doesn't matter, the only thing that matters is the svn:date properties on the revisions.  If they are not only increasing, then you hit issue #752)
+[13:26] Tlaloc: kfogel: wasn't there an issue with fsfs sometimes getting the commits out of order since it uses the date at the start of the commit>
+[13:26] kfogel: Tlaloc: oh!  There could be, I didn't know about that.
+[13:26] aslak: kfogel: do you have svn 1.3.0 or head? do you get 2 log entries with svn log http://buildpatterns.com/svn/repos/rscm/trunk/test/ --revision {"2006-03-03 11:55:55"}:{"2006-03-03 18:24:08"}
+[13:26] zirpu left the chat room.
+[13:26] Guard][an joined the chat room.
+[13:27] Guard][an: re
+[13:27] kfogel: aslak: I get r156 and r157, with near-HEAD of trunk.
+[13:27] kfogel: aslak: but the client is irrelevant
+[13:27] kfogel: only the server-side matters here
+[13:27] aslak: ok. but r156 is *before* 2006-03-03 11:55:55 (by 1 sec)
+[13:27] Guard][an: what will happen with the subversion win32 installer ??? if apache 2.0.x requires APR 0.9.7 but apache 2.2 requires APR 1.2 ?
+[13:27] aslak: so is it safe to file a bugreport?
+[13:29] kfogel: aslak: what's your server version?
+[13:29] aslak: svn, version 1.2.1 (r15230)
+[13:29] aslak:   compiled Aug 26 2005, 18:44:55
+[13:29] kfogel: aslak: phone call
+[13:29] aslak: kfogel:  i'll wait
+[13:29] kfogel: afk
+[13:30] josip joined the chat room.
+[13:30] josip: hello, can anyone point me to a good linux svn cleint ? I need a simple one so even newbs could use it.
+[13:31] nightswim: svn
+[13:31] josip: AFAIK nautilus doesn't support ;(
+[13:31] josip: not command line, gui
+[13:31] jcscoobyrs: josip: RapidSVN I think is linux with gui client.
+[13:32] jcscoobyrs: http://rapidsvn.tigris.org/
+[13:32] frederico left the chat room. (Read error: 104 (Connection reset by peer))
+[13:32] josip: it's not bad
+[13:35] kfogel: aslak: It'd be better to reproduce anything with head of trunk before filing a bug.  But, first, is this a client-time vs server-time thing?
+[13:35] kfogel: hmmm
+[13:35] kfogel: no, I added "-0600" to the time strings, same result
+[13:35] jcscoobyrs: josip: Will RapidSVN work for you?
+[13:36] josip: It's kinda ugly :), probably
+[13:36] kfogel: aslak: if you can reproduce with head, or at least with 1.3.0, please post the bug report to dev@ first.  We'll take it from there.
+[13:36] aslak: kfogel: i think i've stumbled upon a very old unresolved bug: http://subversion.tigris.org/issues/show_bug.cgi?id=1642
+[13:36] josip: since there're ruby svn bindings I could probably work out something on rails
+[13:36] aslak: that bug is unresolved, so it's maybe likely it's still unresolved?
+[13:36] dylunio joined the chat room.
+[13:36] waltz left the chat room.
+[13:37] kfogel: aslak: I think so.
+[13:37] kfogel: nice tracking down of the bug, btw
+[13:37] aslak: heh, i host a couple of oss projects myself, so i know the protocol
+[13:38] kfogel: well, we're unusual in how much we protect the bug tracker
+[13:38] aslak: i'll post a bug if it's still there in HEAD
+[13:38] kfogel: we like most things to go through the list first, or at least IRC
+[13:38] kfogel: aslak: thanks
+[13:38] aslak: thanks to you!
+[13:38] jcscoobyrs: kfogel: You are right.
+[13:39] kfogel: jcscoobyrs: it's really cut down on how much time we spend deleting invalid bug tickets
+[13:39] jcscoobyrs: kfogel: I bet.  dlr and davidjames and I go through this a good bit.
+[13:40] shruggar: maybe I should buy the svn book so I could put it on the bookshelf and point to it when they have a question...
+[13:41] shruggar: "they".. yeah.. there's a sign of a sentence which started as one thing and ended as another..
+[13:41] urkle__ joined the chat room.
+[13:41] shruggar: my /brain/ needs history tracking 
+[13:42] Guardian joined the chat room.
+[13:43] burley-sf joined the chat room.
+[13:44] Guardian left the chat room. (Client Quit)
+[13:45] kfogel: aslak: you might want to add this IRC transcript (edited appropriately) to that issue
+[13:45] aslak: kfogel: ok
+[13:47] kfogel: thakns
