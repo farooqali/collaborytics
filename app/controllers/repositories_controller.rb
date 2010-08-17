@@ -41,7 +41,7 @@ class RepositoriesController < ApplicationController
     end
     
     # render
-    respond_to do |format|
+    respond_to do |format|c
       format.html # show.html.erb
       format.xml  { render :xml => @repository }
     end
@@ -55,7 +55,6 @@ class RepositoriesController < ApplicationController
   end
   
   def end_date_param
-    require 'ruby-debug'
     end_date = params[:date_range].split('-')[1]
     Date.parse(end_date)
   rescue
